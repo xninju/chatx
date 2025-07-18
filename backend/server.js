@@ -101,10 +101,8 @@ io.on('connection', (socket) => {
 // If deploying both frontend and backend from same repo, and your frontend build is in frontend/dist
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const frontendPath = path.join(__dirname, 'frontend', 'dist');
+const frontendPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendPath));
-
-// For any route not handled by your backend, serve index.html (for React Router support)
 app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });

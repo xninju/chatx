@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import { Server } from 'socket.io';
 import http from 'http';
 import pool from './db.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -29,6 +31,7 @@ app.post('/api/register', async (req, res) => {
     );
     res.json({ user: result.rows[0] });
   } catch (e) {
+    console.error('Registration error:', e); // <-- Add this line
     res.status(400).json({ error: 'Username already exists' });
   }
 });
@@ -92,6 +95,18 @@ io.on('connection', (socket) => {
     };
     io.emit('message', message);
   });
+});
+
+// --- Serve Frontend (Static) ---
+// If deploying both frontend and backend from same repo, and your frontend build is in frontend/dist
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendPath = path.join(__dirname, 'frontend', 'dist');
+app.use(express.static(frontendPath));
+
+// For any route not handled by your backend, serve index.html (for React Router support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // --- Start ---
